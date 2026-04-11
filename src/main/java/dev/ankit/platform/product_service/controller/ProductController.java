@@ -61,4 +61,29 @@ public class ProductController {
 
         return ResponseEntity.ok(response);
     }
+
+    @GetMapping("/search")
+    public ResponseEntity<List<ProductResponse>> search(
+            @RequestParam(name = "q", required = false) String query,
+            @RequestParam(name = "category", required = false) String category,
+            @RequestParam(name = "page", defaultValue = "0") int page,
+            @RequestParam(name = "size", defaultValue = "10") int size
+    ) {
+
+        log.info("Searching products query='{}', category='{}', page={}, size={}",
+                query, category, page, size);
+
+        List<ProductResponse> response = service.search(query, category, page, size);
+
+        log.info("Product search completed results={}", response.size());
+
+        return ResponseEntity.ok(response);
+    }
+
+    @PostMapping("/search/reindex")
+    public ResponseEntity<Void> reindexSearchCatalog() {
+        log.info("Manual request received to reindex product catalog into Elasticsearch");
+        service.reindexSearchCatalog();
+        return ResponseEntity.accepted().build();
+    }
 }
